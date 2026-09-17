@@ -34,33 +34,28 @@ jobs:
           git fetch origin
           git fetch upstream
           git reset --hard "upstream/${{ env.UPSTREAM_BRANCH }}"
-          git checkout origin/main -- .github README.md uboot-mtk-20250711/configs/mt7981_qihoo_360t7_defconfig || true
-          git add .
-          if ! git diff --staged --quiet; then
-            git commit -m "Sync upstream and preserve custom files"
-            git push -f origin main
-          fi
 
       - run: |
           sudo timedatectl set-timezone "$TZ"
           sudo apt-get update -qq
-          sudo apt-get install -qq -y gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler nodejs npm
+          sudo apt-get install -qq -y gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler
+          mkdir -p /tmp/release
 
       - run: |
           chmod +x build.sh compile_atf.sh
           make BOARD=${{ env.TARGET_BOARD }} VERSION=${{ env.VERSION }} VARIANT=${{ env.VARIANT }} BUILD_ATF=1 BUILD_FIP=1 MULTI_LAYOUT=1 FIXED_MTDPARTS=1 build
-          mkdir -p release
-          for f in output/*bl2*.img; do cp -f "$f" "release/STOCK-$(basename "$f")"; done
-          for f in output/*fip*.bin; do cp -f "$f" "release/STOCK-$(basename "$f")"; done
+          for f in output/*bl2*.img; do cp -f "$f" "/tmp/release/360t7-bl2-stock.img"; done
+          for f in output/*fip*.bin; do cp -f "$f" "/tmp/release/360t7-fip.bin"; done
 
       - run: |
-          make -C atf-20250711 CROSS_COMPILE=aarch64-linux-gnu- PLAT=mt7981 clean
+          git clean -fdx
+          git reset --hard HEAD
           make -C atf-20250711 CROSS_COMPILE=aarch64-linux-gnu- PLAT=mt7981 BOOT_DEVICE=ram DRAM_USE_DDR3=1 bl2
-          cp -f atf-20250711/build/mt7981/release/bl2.bin release/mt7981-uart-ddr3-bl2.bin
+          cp -f atf-20250711/build/mt7981/release/bl2.bin /tmp/release/mt7981-uart-ddr3-bl2.bin
 
       - run: |
-          make -C atf-20250711 CROSS_COMPILE=aarch64-linux-gnu- PLAT=mt7981 clean
-          rm -rf output/*
+          git clean -fdx
+          git reset --hard HEAD
           
           cat << 'EOF' > atf-20250711/plat/mediatek/mt7981/drivers/pll/pll.c
           #include <drivers/delay_timer.h>
@@ -207,10 +202,13 @@ jobs:
           }
           EOF
           
+          chmod +x build.sh compile_atf.sh
           make BOARD=${{ env.TARGET_BOARD }} VERSION=${{ env.VERSION }} VARIANT=${{ env.VARIANT }} BUILD_ATF=1 BUILD_FIP=1 MULTI_LAYOUT=1 FIXED_MTDPARTS=1 build
-          for f in output/*bl2*.img; do cp -f "$f" "release/OC1.7G-$(basename "$f")"; done
+          for f in output/*bl2*.img; do cp -f "$f" "/tmp/release/360t7-bl2-1.7g.img"; done
 
       - run: |
+          mkdir -p release
+          mv /tmp/release/* release/
           cd release
           sha256sum *.img *.bin > sha256sums.txt
           echo "RELEASE_TAG=${{ env.TAG_PREFIX }}-$(date +'%Y%m%d_%H%M')" >> $GITHUB_ENV
