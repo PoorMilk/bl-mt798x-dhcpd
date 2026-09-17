@@ -1,161 +1,352 @@
-Upload complete: 19321 KiB in 472 ms (40934 KiB/s)
+name: Build 360T7 U-Boot & BL2
 
-*** Upgrading Firmware ***
-*** Data: 19784478 (0x12de31e) bytes at 0x460000d0 ***
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 20 * * *'
 
-UBI partition 'ubi' already selected
-Volume fit not found!
-Volume rootfs_data not found!
-Updating volume 'kernel' from 0x460008d0, size 0x443ad8 ... "Error" handler, esr 0xbf000001
-elr: 0000000041e71d0c lr : 0000000041e2e404 (reloc)
-elr: 000000005ff94d0c lr : 000000005ff51404
-x0 : 000000005fb25600 x1 : 000000005fb923c0
-x2 : 0000000000000800 x3 : 00000000000003f0
-x4 : 64ad52bef210c88c x5 : 0000000000000000
-x6 : 00000000000000ff x7 : 000000005fba8bc0
-x8 : 000000005f7fec10 x9 : 000000005fb25280
-x10: 0000000001a49800 x11: 00000000ffffffff
-x12: 00000000ffffffff x13: 0000000000000200
-x14: 000000005f7fea97 x15: 000000005f7fee79
-x16: 000000005ff6d370 x17: 000000001c2ae96c
-x18: 000000005f7ffdd0 x19: 0000000000000000
-x20: 000000005fb25140 x21: 000000005fb25280
-x22: 000000005f7feb80 x23: 0000000000000800
-x24: 000000005fb25140 x25: 0000000000000000
-x26: 0000000000000040 x27: 0000000000000000
-x28: 0000000001a49800 x29: 000000005f7feaa0
+permissions:
+  contents: write
+  actions: write
 
-Code: d65f03c0 f8636824 f8236804 91002063 (cb030044)
-Resetting CPU ...
+env:
+  UPSTREAM_REPO: Yuzhii0718/bl-mt798x-dhcpd
+  UPSTREAM_BRANCH: master
+  TARGET_BOARD: qihoo_360t7
+  TAG_PREFIX: uboot-bl2
+  VERSION: 2025
+  VARIANT: default
+  TZ: Asia/Shanghai
 
-resetting ...
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-F0: 102B 0000
-FA: 1040 0000
-FA: 1040 0000 [0200]
-F9: 0000 0000
-V0: 0000 0000 [0001]
-00: 0000 0000
-BP: 2400 0041 [0000]
-G0: 1190 0000
-EC: 0000 0000 [1000]
-T0: 0000 0256 [010F]
-Jump to BL
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-NOTICE:  BL2: v2.13.0(release):2026.08.31-1437-all-30-g4d5f0ffe0-dirty
-NOTICE:  BL2: Built : 21:22:58, Sep 17 2026
-NOTICE:  WDT: [40000000] Software reset (reboot)
-NOTICE:  EMI: Using DDR3 settings
-NOTICE:  measure value is unexpected
-NOTICE:  EMI: Detected DRAM size: 512MB
-NOTICE:  EMI: complex R/W mem test passed
-NOTICE:  CPU: MT7981 (1700MHz)
-WARNING: CASN page may not exist. Try to read parameter page.
-INFO:    PP COPY 0 CRC read: 0x1ccd, compute: 0x1ccd
-NOTICE:  SPI_NAND parses attributes from parameter page.
-NOTICE:  SPI_NAND Detected ID 0xc8
-NOTICE:  Page size 2048, Block size 131072, size 134217728
-NOTICE:  Initializing NMBM ...
-NOTICE:  Signature found at block 1023 [0x07fe0000]
-NOTICE:  First info table with writecount 0 found in block 976
-NOTICE:  Second info table with writecount 0 found in block 979
-NOTICE:  NMBM has been successfully attached in read-only mode
-INFO:    BL2: Doing platform setup
-INFO:    BL2: Loading image id 3
-INFO:    Loading image id=3 at address 0x40800000
-INFO:    Image id=3 loaded: 0x40800000 - 0x4080b29c
-INFO:    BL2: Loading image id 5
-INFO:    Loading image id=5 at address 0x40800000
-INFO:    Image id=5 loaded: 0x40800000 - 0x408ddd38
-NOTICE:  BL2: Booting BL31
-INFO:    Entry point address = 0x43001000
-INFO:    SPSR = 0x3cd
-INFO:    Total CPU count: 2
-INFO:    MCUSYS: L2C share 256K --> 0K
-INFO:    Disable NETSYS SRAM remapping
-INFO:    SPMC: Changed to SPMC mode
-NOTICE:  BL31: v2.13.0(release):2026.08.31-1437-all-31-g6dcad3adc
-NOTICE:  BL31: Built : 06:27:11, Sep 17 2026
-INFO:    [DEVAPC] devapc_init done
-INFO:    [MPU](Region0)sa:0x0300, ea:0x0301
-INFO:    [MPU](Region0)apc0:0x80b6db69, apc1:0x00b6db6d
-INFO:    [MPU](Region1)sa:0x0000, ea:0x0000
-INFO:    [MPU](Region1)apc0:0x00000000, apc1:0x00000000
-INFO:    [MPU](Region2)sa:0x0000, ea:0x0000
-INFO:    [MPU](Region2)apc0:0x00000000, apc1:0x00000000
-INFO:    [MPU](Region3)sa:0x0000, ea:0x0000
-INFO:    [MPU](Region3)apc0:0x00000000, apc1:0x00000000
-INFO:    GICv3 without legacy support detected.
-INFO:    ARM GICv3 driver initialized in EL3
-INFO:    Maximum SPI INTID supported: 671
-INFO:    BL31: Initializing runtime services
-INFO:    Secondary bootloader is AArch64
-INFO:    BL31: Preparing for EL3 exit to normal world
-INFO:    Entry point address = 0x41e00000
-INFO:    SPSR = 0x3c9
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add upstream "https://github.com/${{ env.UPSTREAM_REPO }}"
+          git fetch origin
+          git fetch upstream
+          git reset --hard "upstream/${{ env.UPSTREAM_BRANCH }}"
 
+      - run: |
+          sudo timedatectl set-timezone "$TZ"
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler
+          mkdir -p /tmp/release
 
-U-Boot 2025.07.1010-Mediatek (Sep 17 2026 - 06:26:42 +0800)
+      - run: |
+          chmod +x build.sh compile_atf.sh
+          make BOARD=${{ env.TARGET_BOARD }} VERSION=${{ env.VERSION }} VARIANT=${{ env.VARIANT }} BUILD_ATF=1 BUILD_FIP=1 MULTI_LAYOUT=1 FIXED_MTDPARTS=1 build
+          for f in output/*bl2*.img; do cp -f "$f" "/tmp/release/360t7-bl2-stock.img"; done
+          for f in output/*fip*.bin; do cp -f "$f" "/tmp/release/360t7-fip.bin"; done
 
-CPU:   MediaTek MT7981
-Model: mt7981-qihoo-360t7
-       (mediatek,mt7981-rfb)
-DRAM:  512 MiB
-Core:  29 devices, 16 uclasses, devicetree: embed
-Loading Environment from MTD... spi-nand: spi_nand spi_nand@0: CASN page check failed
-spi-nand: spi_nand spi_nand@0: Your SPI NAND might not support CASN, or the CASN page is corrupted.
-spi-nand: spi_nand spi_nand@0: Fallback to read ID
-spi-nand: spi_nand spi_nand@0: ESMT SPI NAND was found.
-spi-nand: spi_nand spi_nand@0: 128 MiB, block size: 128 KiB, page size: 2048, OOB size: 64
-Could not find a valid device for nmbm0
-*** Warning - get_mtd_device_nm() failed, using default environment
+      - run: |
+          git clean -fdx
+          git reset --hard HEAD
+          make -C atf-20250711 CROSS_COMPILE=aarch64-linux-gnu- PLAT=mt7981 BOOT_DEVICE=ram DRAM_USE_DDR3=1 bl2
+          cp -f atf-20250711/build/mt7981/release/bl2.bin /tmp/release/mt7981-uart-ddr3-bl2.bin
 
+      - run: |
+          git clean -fdx
+          git reset --hard HEAD
+          
+          cat << 'EOF' > atf-20250711/plat/mediatek/mt7981/drivers/pll/pll.c
+          #include <drivers/delay_timer.h>
+          #include <lib/mmio.h>
+          #include <mcucfg.h>
+          #include <platform_def.h>
+          #include <common/debug.h>
+          #include "pll.h"
 
-Initializing NMBM ...
-Signature found at block 1023 [0x07fe0000]
-First info table with writecount 0 found in block 976
-Second info table with writecount 0 found in block 979
-NMBM has been successfully attached
+          #define aor(v, a, o)			(((v) & (a)) | (o))
+          #define VDNR_DCM_TOP_INFRA_CTRL_0	0x1A02003C
+          #define INFRASYS_BUS_DCM_CTRL		0x10001004
 
-Loading Environment from MTD... OK
-Loading Environment from MTD... OK
-In:    serial@11002000
-Out:   serial@11002000
-Err:   serial@11002000
-Net:   MediaTek MT7531
-eth0: ethernet@15100000
-glbtn: checking reset
-glbtn: no configured key is pressed (use 'glbtn help' for setup)
-netabort: check enabled (UDP port 37541)
-netabort: waiting for trigger, key to skip:  0
+          #define ACLKEN_DIV 			0x10400640
+          #define BUS_PLL_DIVIDER 		0x104007c0
 
-    *** U-Boot Boot Menu ***
+          static unsigned int _mtk_get_cpu_freq(uint32_t valid)
+          {
+          	unsigned int temp, clk26cali_0, clk_cfg_9, clk_misc_cfg_1;
+          	unsigned int read1, read2, bk_mcu;
 
-      1. Startup system (Default)
-      2. Upgrade firmware
-      3. Upgrade ATF BL2
-      4. Upgrade ATF FIP
-      5. Upgrade single image
-      6. Load image
-      7. Start Web failsafe
-      8. Change boot configuration
-      0. Exit
+          	bk_mcu = mmio_read_32(0x104007c0);
+          	mmio_write_32(0x104007c0, 0xe0201);
+          	clk26cali_0 = mmio_read_32(0x1001B320);
+          	clk_misc_cfg_1 = mmio_read_32(0x1001B200);
+          	mmio_write_32(0x1001B200, 0x0);
+          	clk_cfg_9 = mmio_read_32(0x1001B240);
+          	mmio_write_32(0x1001B240, 0x00040000);
+          	mmio_write_32(0x1001B324, (0x27 << 20 | 0x2 << 16 | valid));
+          	mmio_write_32(0x1001B320, 0x101);
+          	temp = mmio_read_32(0x1001B320);
+          	read1 = temp & 0x1;
+          	while (read1 != 0) {
+          		temp = mmio_read_32(0x1001B320);
+          		read1 = temp & 0x1;
+          	}
+          	mdelay(100);
+          	read1 = ((temp & 0xffff0000) >> 16);
+          	read2 = ((temp & 0x00001000) >> 12);
+          	if ((read1 < (valid - 2)) || (read1 > (valid + 2)) || (read2 == 0))
+          		return 0;
+          	mmio_write_32(0x1001B240, clk_cfg_9);
+          	mmio_write_32(0x1001B200, clk_misc_cfg_1);
+          	mmio_write_32(0x1001B320, clk26cali_0);
+          	mmio_write_32(0x104007c0, bk_mcu);
 
+          	return read1;
+          }
 
-  Press UP/DOWN to move, ENTER to select, ESC to quit
-ubi0: attaching mtd6
-ubi0: scanning is finished
-ubi0: attached mtd6 (name "ubi", size 108 MiB)
-ubi0: PEB size: 131072 bytes (128 KiB), LEB size: 126976 bytes
-ubi0: min./max. I/O unit sizes: 2048/2048, sub-page size 2048
-ubi0: VID header offset: 2048 (aligned 2048), data offset: 4096
-ubi0: good PEBs: 864, bad PEBs: 0, corrupted PEBs: 0
-ubi0: user volume: 2, internal volumes: 1, max. volumes count: 128
-ubi0: max/mean erase counter: 4/2, WL threshold: 4096, image sequence number: 0
-ubi0: available PEBs: 683, total reserved PEBs: 181, PEBs reserved for bad PEB handling: 20
-damaged volume, update marker is setVolume fit not found!
+          unsigned int mtk_get_cpu_freq(void)
+          {
+          	unsigned int ret;
+          	ret = _mtk_get_cpu_freq(800U);
+          	if (ret > 0U) return ret * 2U;
+          	ret = _mtk_get_cpu_freq(0x28A); 
+          	if (ret > 0U) return ret * 2U;
+          	return 0;
+          }
 
-Web failsafe UI started
-URL: http://192.168.1.1/
-Press Ctrl+C to exit
-dnsd: started, resolving 'failsafe.lan' -> 192.168.1.1
+          void mtk_pll_init(int skip_dcm_setting)
+          {
+          	mmio_setbits_32(ARMPLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(NET2PLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(MMPLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(SGMIIPLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(WEDMCUPLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(NET1PLL1_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(APLL2_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(MPLL_PWR_CON0, CON0_PWR_ON);
+          	udelay(1);
+          	mmio_clrbits_32(ARMPLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(NET2PLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(MMPLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(SGMIIPLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(WEDMCUPLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(NET1PLL1_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(APLL2_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(MPLL_PWR_CON0, CON0_ISO_EN);
+
+          	mmio_write_32(ARMPLL_CON1, 0x50000000);
+          	mmio_clrbits_32(ARMPLL_CON0, 0x70);
+          	mmio_setbits_32(ARMPLL_CON0, 0x104);
+
+          	mmio_setbits_32(NET2PLL_CON0, 0x114);
+          	mmio_setbits_32(MMPLL_CON0, 0x124);
+          	mmio_setbits_32(SGMIIPLL_CON0, 0x134);
+          	mmio_setbits_32(WEDMCUPLL_CON0, 0x144);
+          	mmio_setbits_32(NET1PLL1_CON0, 0x104);
+          	mmio_setbits_32(APLL2_CON0, 0x134);
+          	mmio_setbits_32(MPLL_CON0, 0x124);
+          	mmio_setbits_32(ARMPLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(NET2PLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(MMPLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(SGMIIPLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(WEDMCUPLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(NET1PLL1_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(APLL2_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(MPLL_CON0, CON0_BASE_EN);
+          	udelay(20);
+          	mmio_setbits_32(NET2PLL_CON0, 0x00800000);
+          	mmio_setbits_32(MMPLL_CON0, 0x00800000);
+          	mmio_setbits_32(WEDMCUPLL_CON0, 0x00800000);
+          	mmio_setbits_32(NET1PLL1_CON0, 0x00800000);
+          	mmio_setbits_32(MPLL_CON0, 0x00800000);
+          	if (skip_dcm_setting == 0) {
+          		mmio_setbits_32(VDNR_DCM_TOP_INFRA_CTRL_0, 0x2);
+          		mmio_write_32(INFRASYS_BUS_DCM_CTRL, 0x5);
+          	}
+          	mmio_clrsetbits_32(ACLKEN_DIV, 0x1f, 0x12);
+          	mmio_setbits_32(BUS_PLL_DIVIDER, 0x3000800);
+          	mmio_setbits_32(BUS_PLL_DIVIDER, (0x1 << 9));
+          	mmio_write_32(CLK_CFG_0, 0x00000101);
+          	mmio_write_32(CLK_CFG_1, 0x01010100);
+          	mmio_write_32(CLK_CFG_2, 0x01010000);
+          	mmio_write_32(CLK_CFG_3, 0x01010101);
+          	mmio_write_32(CLK_CFG_4, 0x01010100);
+          	mmio_write_32(CLK_CFG_5, 0x01010101);
+          	mmio_write_32(CLK_CFG_6, 0x01010101);
+          	mmio_write_32(CLK_CFG_7, 0x01010101);
+          	mmio_write_32(CLK_CFG_8, 0x01010101);
+          	mmio_write_32(0x1001B1C0, 0x7FFEFCE3);
+          	mmio_write_32(0x1001B1C4, 0x3);
+          }
+
+          void mtk_pll_eth_init(void)
+          {
+          	mmio_clrsetbits_32(CLK_CFG_4, 0xffffff00, 0x01010100);
+          	mmio_clrsetbits_32(CLK_CFG_5, 0x00ffffff, 0x00010101);
+          	mmio_write_32(0x1001B1C0, 0x7e0000);
+          }
+          EOF
+          
+          chmod +x build.sh compile_atf.sh
+          make BOARD=${{ env.TARGET_BOARD }} VERSION=${{ env.VERSION }} VARIANT=${{ env.VARIANT }} BUILD_ATF=1 BUILD_FIP=1 MULTI_LAYOUT=1 FIXED_MTDPARTS=1 build
+          for f in output/*bl2*.img; do cp -f "$f" "/tmp/release/360t7-bl2-1.6g.img"; done
+
+      - run: |
+          git clean -fdx
+          git reset --hard HEAD
+          
+          cat << 'EOF' > atf-20250711/plat/mediatek/mt7981/drivers/pll/pll.c
+          #include <drivers/delay_timer.h>
+          #include <lib/mmio.h>
+          #include <mcucfg.h>
+          #include <platform_def.h>
+          #include <common/debug.h>
+          #include "pll.h"
+
+          #define aor(v, a, o)			(((v) & (a)) | (o))
+          #define VDNR_DCM_TOP_INFRA_CTRL_0	0x1A02003C
+          #define INFRASYS_BUS_DCM_CTRL		0x10001004
+
+          #define ACLKEN_DIV 			0x10400640
+          #define BUS_PLL_DIVIDER 		0x104007c0
+
+          static unsigned int _mtk_get_cpu_freq(uint32_t valid)
+          {
+          	unsigned int temp, clk26cali_0, clk_cfg_9, clk_misc_cfg_1;
+          	unsigned int read1, read2, bk_mcu;
+
+          	bk_mcu = mmio_read_32(0x104007c0);
+          	mmio_write_32(0x104007c0, 0xe0201);
+          	clk26cali_0 = mmio_read_32(0x1001B320);
+          	clk_misc_cfg_1 = mmio_read_32(0x1001B200);
+          	mmio_write_32(0x1001B200, 0x0);
+          	clk_cfg_9 = mmio_read_32(0x1001B240);
+          	mmio_write_32(0x1001B240, 0x00040000);
+          	mmio_write_32(0x1001B324, (0x27 << 20 | 0x2 << 16 | valid));
+          	mmio_write_32(0x1001B320, 0x101);
+          	temp = mmio_read_32(0x1001B320);
+          	read1 = temp & 0x1;
+          	while (read1 != 0) {
+          		temp = mmio_read_32(0x1001B320);
+          		read1 = temp & 0x1;
+          	}
+          	mdelay(100);
+          	read1 = ((temp & 0xffff0000) >> 16);
+          	read2 = ((temp & 0x00001000) >> 12);
+          	if ((read1 < (valid - 2)) || (read1 > (valid + 2)) || (read2 == 0))
+          		return 0;
+          	mmio_write_32(0x1001B240, clk_cfg_9);
+          	mmio_write_32(0x1001B200, clk_misc_cfg_1);
+          	mmio_write_32(0x1001B320, clk26cali_0);
+          	mmio_write_32(0x104007c0, bk_mcu);
+
+          	return read1;
+          }
+
+          unsigned int mtk_get_cpu_freq(void)
+          {
+          	unsigned int ret;
+          	ret = _mtk_get_cpu_freq(850U);
+          	if (ret > 0U) return ret * 2U;
+          	ret = _mtk_get_cpu_freq(0x28A); 
+          	if (ret > 0U) return ret * 2U;
+          	return 0;
+          }
+
+          void mtk_pll_init(int skip_dcm_setting)
+          {
+          	mmio_setbits_32(ARMPLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(NET2PLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(MMPLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(SGMIIPLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(WEDMCUPLL_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(NET1PLL1_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(APLL2_PWR_CON0, CON0_PWR_ON);
+          	mmio_setbits_32(MPLL_PWR_CON0, CON0_PWR_ON);
+          	udelay(1);
+          	mmio_clrbits_32(ARMPLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(NET2PLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(MMPLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(SGMIIPLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(WEDMCUPLL_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(NET1PLL1_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(APLL2_PWR_CON0, CON0_ISO_EN);
+          	mmio_clrbits_32(MPLL_PWR_CON0, CON0_ISO_EN);
+
+          	mmio_write_32(ARMPLL_CON1, 0x55000000);
+          	mmio_clrbits_32(ARMPLL_CON0, 0x70);
+          	mmio_setbits_32(ARMPLL_CON0, 0x104);
+
+          	mmio_setbits_32(NET2PLL_CON0, 0x114);
+          	mmio_setbits_32(MMPLL_CON0, 0x124);
+          	mmio_setbits_32(SGMIIPLL_CON0, 0x134);
+          	mmio_setbits_32(WEDMCUPLL_CON0, 0x144);
+          	mmio_setbits_32(NET1PLL1_CON0, 0x104);
+          	mmio_setbits_32(APLL2_CON0, 0x134);
+          	mmio_setbits_32(MPLL_CON0, 0x124);
+          	mmio_setbits_32(ARMPLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(NET2PLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(MMPLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(SGMIIPLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(WEDMCUPLL_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(NET1PLL1_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(APLL2_CON0, CON0_BASE_EN);
+          	mmio_setbits_32(MPLL_CON0, CON0_BASE_EN);
+          	udelay(20);
+          	mmio_setbits_32(NET2PLL_CON0, 0x00800000);
+          	mmio_setbits_32(MMPLL_CON0, 0x00800000);
+          	mmio_setbits_32(WEDMCUPLL_CON0, 0x00800000);
+          	mmio_setbits_32(NET1PLL1_CON0, 0x00800000);
+          	mmio_setbits_32(MPLL_CON0, 0x00800000);
+          	if (skip_dcm_setting == 0) {
+          		mmio_setbits_32(VDNR_DCM_TOP_INFRA_CTRL_0, 0x2);
+          		mmio_write_32(INFRASYS_BUS_DCM_CTRL, 0x5);
+          	}
+          	mmio_clrsetbits_32(ACLKEN_DIV, 0x1f, 0x12);
+          	mmio_setbits_32(BUS_PLL_DIVIDER, 0x3000800);
+          	mmio_setbits_32(BUS_PLL_DIVIDER, (0x1 << 9));
+          	mmio_write_32(CLK_CFG_0, 0x00000101);
+          	mmio_write_32(CLK_CFG_1, 0x01010100);
+          	mmio_write_32(CLK_CFG_2, 0x01010000);
+          	mmio_write_32(CLK_CFG_3, 0x01010101);
+          	mmio_write_32(CLK_CFG_4, 0x01010100);
+          	mmio_write_32(CLK_CFG_5, 0x01010101);
+          	mmio_write_32(CLK_CFG_6, 0x01010101);
+          	mmio_write_32(CLK_CFG_7, 0x01010101);
+          	mmio_write_32(CLK_CFG_8, 0x01010101);
+          	mmio_write_32(0x1001B1C0, 0x7FFEFCE3);
+          	mmio_write_32(0x1001B1C4, 0x3);
+          }
+
+          void mtk_pll_eth_init(void)
+          {
+          	mmio_clrsetbits_32(CLK_CFG_4, 0xffffff00, 0x01010100);
+          	mmio_clrsetbits_32(CLK_CFG_5, 0x00ffffff, 0x00010101);
+          	mmio_write_32(0x1001B1C0, 0x7e0000);
+          }
+          EOF
+          
+          chmod +x build.sh compile_atf.sh
+          make BOARD=${{ env.TARGET_BOARD }} VERSION=${{ env.VERSION }} VARIANT=${{ env.VARIANT }} BUILD_ATF=1 BUILD_FIP=1 MULTI_LAYOUT=1 FIXED_MTDPARTS=1 build
+          for f in output/*bl2*.img; do cp -f "$f" "/tmp/release/360t7-bl2-1.7g.img"; done
+
+      - run: |
+          mkdir -p release
+          mv /tmp/release/* release/
+          cd release
+          sha256sum *.img *.bin > sha256sums.txt
+          echo "RELEASE_TAG=${{ env.TAG_PREFIX }}-$(date +'%Y%m%d_%H%M')" >> $GITHUB_ENV
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: 360T7 U-Boot & BL2
+          make_latest: true
+          files: release/*
+
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release list --repo "${{ github.repository }}" --limit 100 --json tagName --jq '.[5:][].tagName' | while read -r tag; do [ -n "$tag" ] && gh release delete "$tag" --repo "${{ github.repository }}" --cleanup-tag -y; done
+          gh run list --repo "${{ github.repository }}" --limit 100 --json databaseId --jq '.[5:][].databaseId' | while read -r run_id; do [ -n "$run_id" ] && gh run delete "$run_id" --repo "${{ github.repository }}"; done
